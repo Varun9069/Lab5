@@ -1,6 +1,6 @@
 ---
 title: "Lab5"
-author: "Your Name"
+author: "Varun"
 date: "2024-10-03"
 output: "github_document"
 ---
@@ -15,7 +15,7 @@ library(bruceR)
 library(dplyr)
 library(labelled)
 
-lab5 <- read.csv("C:/Users/Colin/Documents/GitHub/Website/Lab5/lab5data.csv")
+lab5 <- read.csv("C:/Users/vtrip/OneDrive/Documents/GitHub/Lab5/lab5data.csv")
 
 ```
 
@@ -74,7 +74,7 @@ emm<- emmeans(model, "Group")
 
 emm
 
-contrast(emm, list("Greek Women vs. Greek Men" = c(1, 1, 0, 0)))
+contrast(emm, list("Greek Women vs. Greek Men" = c(-1, 1, 0, 0)))
 
 contrast(emm, list("Greek Main Effect" = c(1, 1, -1, -1)))
 
@@ -126,20 +126,42 @@ ggplot(plot2, aes(x = Group, y = Drinks, fill = Group)) +
 
 ```
 
-# Q1: You hypothesized that Greek Women have a lower GPA than non-Greek women. Conduct the correct analysis below and explain whether or not your hypothesis is supported. 
+# Q1: You hypothesized that Greek Women have a lower GPA than non-Greek women. Conduct the correct analysis below and explain whether or not your hypothesis is supported.
+
+We conudcted a simple effect test to explore the mean difference between non-greek women and greek women and the p-value indicated the differences were not significant. This suggests that our hypothesis is not supported: there is no significant difference between the GPAs between the greek women and non-greek women
 ```{r}
+model <- lm(GPA ~ Group, data = lab5)
+
+emm<- emmeans(model, "Group")
+
+emm
+
+contrast(emm, list("Greek Women vs. Non-Greek women" = c(-1, 0, 1, 0)))
 
 
 
 ```
 
 # Q2: You hypothesized that on average women have a higher GPA than men. Conduct the correct analysis below and explain whether or not your hypothesis is supported. 
+
+The main effect between men and women indicated no difference, as the p-value was greater than 0.05. We then explored the simple effects, both of which were not significant. There was no significant difference in GPAs between greek men and women; nor was there a significant difference in GPAs between non-greek men and non-greek women. Therefore, our hypothesis is not supported. 
 ```{r}
+contrast(emm, list("Gender Main Effect" = c(1, -1, 1, -1)))
+contrast(emm, list("Greek Women vs. Greek Men" = c(-1, 1, 0, 0)))
+contrast(emm, list("Non-Greek Women vs. Non-Greek Men" = c(0, 0, -1, 1)))
 
 
 ```
 
 # Q3: Create a bar graph to compare GPA by gender and greek (either graph works)
 ```{r}
+lab5_clean <- lab5 %>%
+  drop_na(GPA)
+
+plot<-summarySE(lab5_clean, measurevar="GPA", groupvars=c("Gender", "Greek"))
+plot
+
+ggplot(plot, aes(x = Greek, y = GPA, fill = Greek)) +
+  geom_col() + facet_wrap(~ Gender) + theme_bruce()
 
 ```
